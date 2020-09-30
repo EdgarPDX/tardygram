@@ -47,4 +47,26 @@ describe('tardygram routes', () => {
     });
   });
 
+  it('Verify user using GET', async()  => {
+    const agent = request.agent(app);
+    await agent
+      .post('/api/v1/auth/signup')
+      .send({
+        email: 'test@test.com',
+        password: 'password',
+        profilePhotoURL:'https://www.placecage.com/200/300'
+      });
+
+    const response = await agent
+      .get('/api/v1/auth/verify');
+
+    expect(response.body).toEqual({
+      userId: expect.any(String),
+      email: 'test@test.com',
+      profilePhotoURL: 'https://www.placecage.com/200/300'
+    });
+
+    
+  });
+
 });
