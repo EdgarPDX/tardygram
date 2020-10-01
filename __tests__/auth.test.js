@@ -1,14 +1,12 @@
-const fs = require('fs');
-const pool = require('../lib/utils/pool');
+const { getAgent } = require('../data/data-helpers');
 const request = require('supertest');
 const app = require('../lib/app');
-const UserService = require('../lib/services/user-service');
+
+
 
 
 describe('tardygram routes', () => {
-  beforeEach(() => {
-    return pool.query(fs.readFileSync('./sql/setup.sql', 'utf-8'));
-  });
+  
 
   it('signup for a user using POST', async() => {
     const response = await request(app)
@@ -27,33 +25,27 @@ describe('tardygram routes', () => {
   });
 
   it('logs in a user via POST', async() => {
-    const user = await UserService.create({
-      email: 'test@test.com',
-      password: 'password1',
-      profilePhotoURL: 'https://www.placecage.com/200/300'
-    });
-
     const response = await request(app)
       .post('/api/v1/auth/login')
       .send({
-        email:'test@test.com',
+        email:'test1@tester.com',
         password: 'password1'
       });
 
     expect(response.body).toEqual({
-      userId: user.userId,
-      email: 'test@test.com',
+      userId: expect.any(String),
+      email: 'test1@tester.com',
       profilePhotoURL: 'https://www.placecage.com/200/300'
     });
   });
 
   it('Verify user using GET', async()  => {
-    const agent = request.agent(app);
+    const agent = await getAgent();
     await agent
       .post('/api/v1/auth/signup')
       .send({
-        email: 'test@test.com',
-        password: 'password',
+        email: 'test1@test.com',
+        password: 'password1',
         profilePhotoURL:'https://www.placecage.com/200/300'
       });
 
@@ -62,7 +54,7 @@ describe('tardygram routes', () => {
 
     expect(response.body).toEqual({
       userId: expect.any(String),
-      email: 'test@test.com',
+      email: 'test1@test.com',
       profilePhotoURL: 'https://www.placecage.com/200/300'
     });
 
